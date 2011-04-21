@@ -1,0 +1,27 @@
+#Configuration file for grating_test.py
+
+#UV_HOST - IP address for the Labview VI
+UV_HOST = 127.0.0.1
+
+#UV_PORT - IP Port for the Labview VI
+UV_PORT = 2526
+
+#DATA_DIR - Directory in which to store the data
+DATA_DIR = /home/deen/Data/Instrumentation/Exposure_System/Intensity_Distribution/
+
+#Smart Motor Interface
+#====================================
+#SMI_COM_PORT - Com port of the Smart Motor Interface   (COM1 = 0, COM2 = 1, etc...)
+SMI_COM_PORT = 4
+
+#SMI_BYTESIZE - bytesize for the SMI com port
+SMI_BYTESIZE = 8
+
+#SMI_PARITY - parity of the SMI com port
+SMI_PARITY = N
+
+#SMI_STOPBITS - stopbits of the SMI com port
+SMI_STOPBITS = 1
+
+#SMI_BAUDRATE - baudrate for the SMI com port
+SMI_BAUDRATE = 9600
