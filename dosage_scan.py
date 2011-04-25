@@ -100,7 +100,7 @@ junk = smi.read(smi.inWaiting())
 
 smi.write('MV\n')
 smi.write('A=40\n')
-smi.write('V=400000\n')
+smi.write('V=200000\n')
 smi.write('G\n')
 
 left_limit_switch = 0
@@ -116,7 +116,7 @@ while ((left_limit_switch + right_limit_switch) == 0.0):
 
 smi.write('X\nO=0\nZS\n')
 
-smi.write('MP\nV=400000\nP=-100000\n')
+smi.write('MP\nV=200000\nP=-100000\n')
 smi.write('G\n')
 
 position = 0
@@ -140,8 +140,8 @@ ystart = float(raw_input('Enter Y-starting position: '))
 ystop = float(raw_input('Enter Y-stopping position: '))
 ystep = float(raw_input('Enter Y-step size: '))
 '''
-ystart = -1.0
-ystop = 3.0
+ystart = -0.5
+ystop = 2.0
 start_pos = spi*ystart
 end_pos = spi*ystop
 #ystep = 0.1
@@ -152,8 +152,8 @@ xstart = float(raw_input('Enter X-starting position: '))
 xstop = float(raw_input('Enter X-stopping position: '))
 xstep = float(raw_input('Enter X-step size: '))
 '''
-xstart = 2
-xstop = 2.1
+xstart = 2  #always start at 2 in from the outer frame
+xstop = 8.5 #most inside position of photo diode
 xstep = 0.1
 
 #nptsy = int((ystop-ystart)/ystep)+1
