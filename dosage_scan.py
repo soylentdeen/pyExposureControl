@@ -49,17 +49,21 @@ class voltageReader( object ):
 
 plt = Gnuplot.Gnuplot()
 
-configuration_text = open('exposure_system_config.txt', 'r').readlines()
+configuration_text = open('exposure_control_config.txt', 'r').readlines()
 parameters = dict()
 for line in configuration_text:
-    if line[0] != '#':
+    if ((line[0] != '#') & (line[0] != '\n') ):
         l = line.split()
         try:
             parameters[l[0].upper()] = float(l[2])
             print 'Added float ', parameters[l[0].upper()], ' as entry for key ', l[0].upper()
         except:
-            parameters[l[0].upper()] = l[2]
-            print 'Added text variable ', parameters[l[0].upper()], ' as entry for key ', l[0].upper()
+            if line.find("\"") == -1:
+               parameters[l[0].upper()] = l[2]
+               print 'Added text variable ', parameters[l[0].upper()], ' as entry for key ', l[0].upper()
+            else:
+               parameters[l[0].upper()] = line[line.find("\"")+1:line.rfind("\"")]
+               print 'Added new text variable ', parameters[l[0].upper()], ' as entry for key ', l[0].upper()
 
 UV = voltageReader(parameters)
 time.sleep(1)
@@ -69,10 +73,10 @@ print "Serial Communication Program"
 print " cross your fingers"
 timeout = 0.25
 
-outputdatafile = 'baffle_test.dat'
+outputdatafile = parameters["DATA_DIR"]+parameters["FILENAME"]
 
 #Set up the Smart-Motor interface
-smi = serial.Serial(parameters["SMI_COM_PORT"], bytesize=parameters["SMI_BYTESIZE"], partity=parameters["SMI_PARITY"],stopbits=parameters["SMI_STOPBITS"], baudrate = parameters["SMI_BAUDRATE"])
+smi = serial.Serial(parameters["SMI_COM_PORT"], bytesize=parameters["SMI_BYTESIZE"], parity=parameters["SMI_PARITY"],stopbits=parameters["SMI_STOPBITS"], baudrate = parameters["SMI_BAUDRATE"])
 
 smi.write('ECHO_OFF\n')
 smi.write('SADR1\n')
@@ -120,15 +124,15 @@ spi = 10000.0  # steps per inch
 t = numpy.zeros(0, float)
 
 # y direction is perpendicular to slit
-ystart = -1.0
-ystop = 3.0
+ystart = -0.5
+ystop = 2.0
 start_pos = spi*ystart
 end_pos = spi*ystop
 
 # x direction is parallel to slit
 xstart = 2
-xstop = 2.1
-xstep = 0.1
+xstop = 8.5
+xstep = 0.5
 
 nptsx = int((xstop-xstart)/xstep)+1
 
@@ -171,8 +175,6 @@ for x in range(0, nptsx):
 
 
 smi.close()
-
-outputdatafile = parameters["DATA_DIR"]+raw_input('Enter Output Filename :')
 
 out = open(outputdatafile, 'a')
 xcoords = numpy.arange(0, nptsx)*xstep + xstart
