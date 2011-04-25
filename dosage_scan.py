@@ -5,9 +5,6 @@ import threading
 import socket
 import sys
 import Gnuplot
-#import pylab
-#import scipy
-#from scipy.interpolate import splprep, splev
 
 class voltageReader( object ):
    def __init__(self, parameters):
@@ -50,44 +47,32 @@ class voltageReader( object ):
    def close(self):
       self.sock.close()
 
-class measurement:
-   x = 0.0
-   y = 0.0
-   z = 0.0
-   dz = 0.0
+plt = Gnuplot.Gnuplot()
 
-parameters = {'UV_HOST':'127.0.0.1', 'UV_PORT':2526}
+configuration_text = open('exposure_system_config.txt', 'r').readlines()
+parameters = dict()
+for line in configuration_text:
+    if line[0] != '#':
+        l = line.split()
+        try:
+            parameters[l[0].upper()] = float(l[2])
+            print 'Added float ', parameters[l[0].upper()], ' as entry for key ', l[0].upper()
+        except:
+            parameters[l[0].upper()] = l[2]
+            print 'Added text variable ', parameters[l[0].upper()], ' as entry for key ', l[0].upper()
 
 UV = voltageReader(parameters)
 time.sleep(1)
-'''
-UV.startMeasurement()
-time.sleep(5)
-try:
-   a = UV.readVoltage()
-except:
-   a = 'None'
-print a
-time.sleep(10)
-UV.stopMeasurement()
-try:
-   b = UV.readVoltage()
-except:
-   b = 'None'
-UV.close()
-print asdf
-'''
+
 t1 = time.time()
 print "Serial Communication Program"
 print " cross your fingers"
 timeout = 0.25
-baudrate = 9600
-NEWLINE_CONVERSION_MAP = ('\n', '\r', '\r\n')
 
 outputdatafile = 'baffle_test.dat'
 
 #Set up the Smart-Motor interface
-smi = serial.Serial(4, bytesize=8, parity='N', stopbits=1, baudrate=9600)
+smi = serial.Serial(parameters["SMI_COM_PORT"], bytesize=parameters["SMI_BYTESIZE"], partity=parameters["SMI_PARITY"],stopbits=parameters["SMI_STOPBITS"], baudrate = parameters["SMI_BAUDRATE"])
 
 smi.write('ECHO_OFF\n')
 smi.write('SADR1\n')
@@ -135,32 +120,19 @@ spi = 10000.0  # steps per inch
 t = numpy.zeros(0, float)
 
 # y direction is perpendicular to slit
-'''
-ystart = float(raw_input('Enter Y-starting position: '))
-ystop = float(raw_input('Enter Y-stopping position: '))
-ystep = float(raw_input('Enter Y-step size: '))
-'''
-ystart = -0.5
-ystop = 2.0
+ystart = -1.0
+ystop = 3.0
 start_pos = spi*ystart
 end_pos = spi*ystop
-#ystep = 0.1
 
 # x direction is parallel to slit
-'''
-xstart = float(raw_input('Enter X-starting position: '))
-xstop = float(raw_input('Enter X-stopping position: '))
-xstep = float(raw_input('Enter X-step size: '))
-'''
-xstart = 2  #always start at 2 in from the outer frame
-xstop = 8.5 #most inside position of photo diode
+xstart = 2
+xstop = 2.1
 xstep = 0.1
 
-#nptsy = int((ystop-ystart)/ystep)+1
 nptsx = int((xstop-xstart)/xstep)+1
 
 m = []
-#meas = numpy.zeros([nptsx, nptsy])
 
 for x in range(0, nptsx):
    x_coord = x*xstep + xstart
@@ -187,41 +159,30 @@ for x in range(0, nptsx):
          time.sleep(0.2)
          curr_pos = int(smi.read(smi.inWaiting()).split('\r')[0])
       UV.stopMeasurement()
-      m.append(UV.readVoltage().split('\r\n'))
+      readings = UV.readVoltage().split('\r\n')
+      intensity = []
+      for reading in readings:
+          try:
+              intensity.append(float(reading))
+          except:
+              print 'Oops'
+      m.append(intensity)
+      plt.plot(Gnuplot.Data(intensity, with_='lines'))
 
 
 smi.close()
 
-plt = Gnuplot.Gnuplot()
+outputdatafile = parameters["DATA_DIR"]+raw_input('Enter Output Filename :')
 
-out = open(outputdatafile, 'w')
+out = open(outputdatafile, 'a')
 xcoords = numpy.arange(0, nptsx)*xstep + xstart
 passes = []
 for p, x in zip(m, xcoords):
    profile = []
    for reading in p:
-      try:
-         profile.append(float(reading))
-         out.write(str(x)+'  '+str(profile[-1])+'\n')
-      except:
-         print 'Oops'
+      out.write(str(x)+'  '+str(reading)+'\n')
    passes.append(Gnuplot.Data(profile, with_='lines'))
 
 apply(plt.plot, passes)
 out.close()
-
-print asdf
-f = open(outputdatafile, 'a')
-
-for x in range(0, nptsx):
-   if meas[x][0] != 0.0:
-      x_coord = x*xstep+xstart
-      f.write(str(x_coord))
-      f.write('\n')
-      for y in range(0, nptsy):
-         f.write(str(meas[x][y]))
-         f.write('    ')
-      f.write('\n')
-
-f.close()
 
