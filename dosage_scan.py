@@ -128,7 +128,7 @@ while( abs(position- (-100000)) > 2):
    print position
 
 #set zero point here
-smi.write('V=200000\n') #speed 100000 for measuring; 200000 for testing
+smi.write('V=100000\n') #speed 100000 for measuring; 200000 for testing
 smi.write('O=0\nZS\n')
 
 spi = 10000.0  # steps per inch
@@ -136,14 +136,14 @@ spi = 10000.0  # steps per inch
 t = numpy.zeros(0, float)
 
 # y direction is perpendicular to slit
-ystart = -0.5
+ystart = -0.25
 ystop = 2.0
 start_pos = spi*ystart
 end_pos = spi*ystop
 
 # x direction is parallel to slit
 xstart = 2
-xstop = 4.5
+xstop = 8.5
 xstep = 0.5
 
 nptsx = int((xstop-xstart)/xstep)+1
@@ -170,15 +170,16 @@ for x in range(0, nptsx):
       curr_pos = int(smi.read(smi.inWaiting()).split('\r')[0])
       UV.startMeasurement()
       smi.write('P='+str(int(end_pos))+'\nG\n')
+      readings = ''
       while( abs(curr_pos-end_pos) > 5):
          smi.write('RP\n')
+         readings += UV.readVoltage()
          time.sleep(0.2)
          curr_pos = int(smi.read(smi.inWaiting()).split('\r')[0])
       UV.stopMeasurement()
       time.sleep(2.0)
-      UV.stopMeasurement()
-      time.sleep(2.0)
-      readings = UV.readVoltage().split('\r\n')
+      readings += UV.readVoltage()
+      readings = readings.split('\r\n')
       intensity = []
       t = []
       for line in readings:
@@ -194,7 +195,7 @@ for x in range(0, nptsx):
 
 smi.close()
 
-out = open(outputdatafile, 'a')
+out = open(outputdatafile, 'w')
 xcoords = numpy.arange(0, nptsx)*xstep + xstart
 passes = []
 for p, x in zip(m, xcoords):
