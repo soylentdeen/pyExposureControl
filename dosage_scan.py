@@ -88,9 +88,20 @@ junk = smi.read(smi.inWaiting())
 #Send motor home
 
 smi.write('MV\n')
-smi.write('A=40\n')
-smi.write('V=200000\n')
+smi.write('V=0\n')
 smi.write('G\n')
+
+time.sleep(2.5)
+
+junk = smi.read(smi.inWaiting())
+
+smi.write('MV\n')
+smi.write('A=40\n')
+smi.write('V=100000\n') #speed 100000 for measuring; 200000 for testing
+smi.write('G\n')
+
+time.sleep(0.5)
+junk = smi.read(smi.inWaiting())
 
 left_limit_switch = 0
 right_limit_switch = 0
@@ -105,7 +116,7 @@ while ((left_limit_switch + right_limit_switch) == 0.0):
 
 smi.write('X\nO=0\nZS\n')
 
-smi.write('MP\nV=200000\nP=-100000\n')
+smi.write('MP\nV=100000\nP=-100000\n')
 smi.write('G\n')
 
 position = 0
@@ -163,6 +174,7 @@ for x in range(0, nptsx):
          time.sleep(0.2)
          curr_pos = int(smi.read(smi.inWaiting()).split('\r')[0])
       UV.stopMeasurement()
+      time.sleep(2.0)
       readings = UV.readVoltage().split('\r\n')
       intensity = []
       for reading in readings:
@@ -183,6 +195,7 @@ for p, x in zip(m, xcoords):
    profile = []
    for reading in p:
       out.write(str(x)+'  '+str(reading)+'\n')
+      profile.append(reading)
    passes.append(Gnuplot.Data(profile, with_='lines'))
 
 apply(plt.plot, passes)
