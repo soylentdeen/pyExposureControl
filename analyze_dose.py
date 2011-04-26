@@ -4,7 +4,7 @@ import Gnuplot
 
 plt = Gnuplot.Gnuplot()
 
-df = '/home/deen/Data/Instrumentation/Exposure_System/Intensity_Distribution/baffle_test_04212011.dat'
+df = '/home/deen/Data/Instrumentation/Exposure_System/Intensity_Distribution/baffle_test_04262011.dat'
 
 data = open(df, 'r').readlines()
 
@@ -25,5 +25,9 @@ plots = []
 for i in xpts:
     bm = scipy.where( x==i)
     plots.append(Gnuplot.Data(y[bm], with_='lines'))
+    print i
+    plt.plot(plots[-1])
+    raw_input()
 
 apply(plt.plot, plots)
+
