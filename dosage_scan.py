@@ -97,7 +97,7 @@ junk = smi.read(smi.inWaiting())
 
 smi.write('MV\n')
 smi.write('A=40\n')
-smi.write('V=100000\n') #speed 100000 for measuring; 200000 for testing
+smi.write('V=200000\n') #speed 100000 for measuring; 200000 for testing
 smi.write('G\n')
 
 time.sleep(0.5)
@@ -116,7 +116,7 @@ while ((left_limit_switch + right_limit_switch) == 0.0):
 
 smi.write('X\nO=0\nZS\n')
 
-smi.write('MP\nV=100000\nP=-100000\n')
+smi.write('MP\nV=200000\nP=-100000\n')
 smi.write('G\n')
 
 position = 0
@@ -128,6 +128,7 @@ while( abs(position- (-100000)) > 2):
    print position
 
 #set zero point here
+smi.write('V=200000\n') #speed 100000 for measuring; 200000 for testing
 smi.write('O=0\nZS\n')
 
 spi = 10000.0  # steps per inch
@@ -142,7 +143,7 @@ end_pos = spi*ystop
 
 # x direction is parallel to slit
 xstart = 2
-xstop = 8.5
+xstop = 4.5
 xstep = 0.5
 
 nptsx = int((xstop-xstart)/xstep)+1
@@ -175,15 +176,20 @@ for x in range(0, nptsx):
          curr_pos = int(smi.read(smi.inWaiting()).split('\r')[0])
       UV.stopMeasurement()
       time.sleep(2.0)
+      UV.stopMeasurement()
+      time.sleep(2.0)
       readings = UV.readVoltage().split('\r\n')
       intensity = []
-      for reading in readings:
-          try:
-              intensity.append(float(reading))
-          except:
-              print 'Oops'
-      m.append(intensity)
-      plt.plot(Gnuplot.Data(intensity, with_='lines'))
+      t = []
+      for line in readings:
+         reading = line.split(',')
+         try:
+            intensity.append(float(reading[0]))
+            t.append(float(reading[1]))
+         except:
+            print 'Oops'
+      m.append(zip(t, intensity))
+      plt.plot(Gnuplot.Data(t, intensity, with_='lines'))
 
 
 smi.close()
@@ -193,10 +199,12 @@ xcoords = numpy.arange(0, nptsx)*xstep + xstart
 passes = []
 for p, x in zip(m, xcoords):
    profile = []
+   t = []
    for reading in p:
-      out.write(str(x)+'  '+str(reading)+'\n')
-      profile.append(reading)
-   passes.append(Gnuplot.Data(profile, with_='lines'))
+      out.write(str(x)+'  '+str(reading[0])+' '+str(reading[1])+'\n')
+      profile.append(reading[1])
+      t.append(reading[0])
+   passes.append(Gnuplot.Data(t, profile, with_='lines'))
 
 apply(plt.plot, passes)
 out.close()

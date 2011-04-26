@@ -1,6 +1,7 @@
 <?xml version='1.0'?>
 <Project Type="Project" LVVersion="8508002">
    <Property Name="varPersistentID:{1D58AF1B-1866-4FC1-9C1F-E9F2F07CA360}" Type="Ref">/My Computer/pyExpCont.lvlib/output_flag</Property>
+   <Property Name="varPersistentID:{4DB26696-C9D6-4D43-AD8F-06328278C80C}" Type="Ref">/My Computer/pyExpCont.lvlib/start_time</Property>
    <Item Name="My Computer" Type="My Computer">
       <Property Name="server.app.propertiesEnabled" Type="Bool">true</Property>
       <Property Name="server.control.propertiesEnabled" Type="Bool">true</Property>
@@ -78,6 +79,9 @@
             <Item Name="ni_tagger_lv_Write.vi" Type="VI" URL="/&lt;vilib&gt;/variable/tagger/ni_tagger_lv_Write.vi"/>
             <Item Name="NGwrite_imp.vi" Type="VI" URL="/&lt;vilib&gt;/variable/NGwrite_imp.vi"/>
          </Item>
+         <Item Name="nilvaiu.dll" Type="Document" URL="nilvaiu.dll"/>
+         <Item Name="lvanlys.dll" Type="Document" URL="../../../../../Program Files/National Instruments/LabVIEW 8.5/resource/lvanlys.dll"/>
+         <Item Name="nitaglv.dll" Type="Document" URL="../../../../../Program Files/National Instruments/LabVIEW 8.5/resource/nitaglv.dll"/>
       </Item>
       <Item Name="Build Specifications" Type="Build"/>
    </Item>
