@@ -7,8 +7,12 @@ plt = Gnuplot.Gnuplot()
 
 #df = '/home/deen/Data/Instrumentation/Exposure_System/Intensity_Distribution/baffle_test_04262011.dat'
 #of_name = ['weisong_raw.ps', 'weisong_int.ps']
-df = '/home/deen/Data/Instrumentation/Exposure_System/Intensity_Distribution/dosage.dat'
-of_name = ['casey_raw.ps', 'casey_int.ps']
+df = '/home/deen/Data/Instrumentation/Exposure_System/Intensity_Distribution/no_mask_dosage.dat'
+plot_name = ['no_mask_raw.ps', 'no_mask_int.ps']
+of_name = 'no_mask_processed.dat'
+#df = '/home/deen/Data/Instrumentation/Exposure_System/Intensity_Distribution/repeatability.dat'
+#plot_name = ['repeatability_raw.ps', 'repeatability_int.ps']
+#of_name = 'repeatability_processed.dat'
 
 data = open(df, 'r').readlines()
 
@@ -50,6 +54,13 @@ dosage = numpy.array(dosage)
 sig = numpy.array(sig)
 means = numpy.array(means)
 
+out = open('./plots/'+of_name, 'w')
+out_dosage = dosage/max(dosage)
+for dat in zip(xpts, out_dosage):
+    out.write(str(dat[0])+' '+str(dat[1])+'\n')
+
+out.close()
+
 bkgndbm = scipy.where( (xpts <= 2.1) | (xpts >= 7.8) )[0]
 bkgnd = numpy.mean(means[bkgndbm])
 error = numpy.mean(sig[bkgndbm])
@@ -67,10 +78,10 @@ plots.append(Gnuplot.Data([0, 17], [bkgnd-error, bkgnd-error], with_='lines'))
 plots.append(Gnuplot.Data([0, 17], [bkgnd+error, bkgnd+error], with_='lines'))
 
 plt('set terminal postscript')
-plt('set out "'+of_name[0]+'"')
+plt('set out "./plots/'+plot_name[0]+'"')
 apply(plt.plot, plots)
 #raw_input()
-plt('set out "'+of_name[1]+'"')
+plt('set out "./plots/'+plot_name[1]+'"')
 d = Gnuplot.Data(xpts, dosage)
 plt.plot(d)
 plt('set out')
