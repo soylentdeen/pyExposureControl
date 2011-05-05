@@ -108,10 +108,13 @@ right_limit_switch = 0
 while ((left_limit_switch + right_limit_switch) == 0.0):
    smi.write('RBl\nRBr\nRP\nZS\n')
    time.sleep(0.5)
-   readings = smi.read(smi.inWaiting()).split('\r')
-   left_limit_switch = float(readings[0])
-   right_limit_switch = float(readings[1])
-   position = float(readings[2])
+   try:
+      readings = smi.read(smi.inWaiting()).split('\r')
+      left_limit_switch = float(readings[0])
+      right_limit_switch = float(readings[1])
+      position = float(readings[2])
+   except:
+      pass
 
 
 smi.write('X\nO=0\nZS\n')

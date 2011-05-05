@@ -4,7 +4,7 @@ import Gnuplot
 
 plt = Gnuplot.Gnuplot()
 
-df = '/home/deen/Data/Instrumentation/Exposure_System/Intensity_Distribution/baffle_test_04262011.dat'
+df = './Data/no_mask_dosage.dat'
 
 data = open(df, 'r').readlines()
 
