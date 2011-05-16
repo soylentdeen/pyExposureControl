@@ -2,3 +2,4 @@ exposure_control_config.txt
 Data/*
 plots/*
 *.ps
+*.eps

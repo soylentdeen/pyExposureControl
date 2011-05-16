@@ -7,9 +7,9 @@ plt = Gnuplot.Gnuplot()
 
 #df = '/home/deen/Data/Instrumentation/Exposure_System/Intensity_Distribution/baffle_test_04262011.dat'
 #of_name = ['weisong_raw.ps', 'weisong_int.ps']
-df = '/home/deen/Data/Instrumentation/Exposure_System/Intensity_Distribution/no_mask_dosage.dat'
-plot_name = ['no_mask_raw.ps', 'no_mask_int.ps']
-of_name = 'no_mask_processed.dat'
+df = '/home/deen/Data/Instrumentation/Exposure_System/Intensity_Distribution/no_mask_dosage_02.dat'
+plot_name = ['no_mask_02_raw.ps', 'no_mask_02_int.ps']
+of_name = 'no_mask_02_processed.dat'
 #df = '/home/deen/Data/Instrumentation/Exposure_System/Intensity_Distribution/repeatability.dat'
 #plot_name = ['repeatability_raw.ps', 'repeatability_int.ps']
 #of_name = 'repeatability_processed.dat'
@@ -41,6 +41,15 @@ xpts = numpy.unique(x)
 plots = []
 for i in xpts:
     bm = scipy.where( x==i)
+    a = numpy.array(t[bm]).view(numpy.recarray)
+    duplicates = numpy.core.records.find_duplicate(a)
+    for dup in duplicates:
+        dup_bm = scipy.where( (x==i) & (t == dup))[0]
+        x = numpy.delete(x, dup_bm[-1])
+        t = numpy.delete(t, dup_bm[-1])
+        y = numpy.delete(y, dup_bm[-1])
+        bm = scipy.where (x == i)
+        
     #plots.append(Gnuplot.Data(y[bm], with_='lines'))
     #dosage.append(scipy.integrate.simps(y[bm]))
     plots.append(Gnuplot.Data(t[bm], y[bm], with_='lines'))
